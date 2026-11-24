@@ -4,12 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Usic - Web Music Player</title>
-        <!-- Load Font Inter agar mirip desain -->
         <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
             rel="stylesheet"
         />
-        <!-- Load FontAwesome untuk ikon-ikon UI -->
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -39,19 +37,18 @@
                                 href="#"
                                 class="nav-link active"
                                 data-target="home"
+                                >Home</a
                             >
-                                Home
-                            </a>
                         </li>
                         <li>
-                            <a href="#" class="nav-link" data-target="search">
-                                Search
-                            </a>
+                            <a href="#" class="nav-link" data-target="search"
+                                >Search</a
+                            >
                         </li>
                         <li>
-                            <a href="#" class="nav-link" data-target="album">
-                                Albums
-                            </a>
+                            <a href="#" class="nav-link" data-target="album"
+                                >Albums</a
+                            >
                         </li>
                     </ul>
                 </nav>
@@ -124,7 +121,6 @@
 
             <!-- ================= AREA TENGAH (TOPBAR + KONTEN) ================= -->
             <div class="center-wrapper">
-                <!-- Top Navigation Bar -->
                 <header class="top-bar">
                     <div class="top-left">
                         <div class="nav-arrows">
@@ -164,13 +160,12 @@
                     </div>
                 </header>
 
-                <!-- Mangkuk Kosong untuk Inject Halaman via Fetch JS -->
                 <main id="main-content">
                     <!-- Konten pages/home.html akan muncul di sini -->
                 </main>
             </div>
 
-            <!-- ================= SIDEBAR KANAN ================= -->
+            <!-- ================= SIDEBAR KANAN (POLOSAN / BELUM ADA ANTREAN) ================= -->
             <aside class="sidebar-right">
                 <!-- Box 1: Friends Activity -->
                 <div class="right-panel-card">
@@ -208,7 +203,7 @@
                     </div>
                 </div>
 
-                <!-- Box 2: Queue -->
+                <!-- Box 2: Queue (Kosong) -->
                 <div class="right-panel-card queue-card">
                     <div class="section-header">
                         <h3>Queue</h3>
@@ -216,127 +211,28 @@
                             >See all</a
                         >
                     </div>
-                    <div class="queue-list">
-                        <!-- Lagu Aktif (Highlight Hijau) -->
-                        <div class="queue-item active-track">
-                            <div class="item-thumb green-thumb">
-                                <i class="fa-solid fa-music"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4 class="text-green">
-                                    Genius (feat. Sia, Diplo)
-                                </h4>
-                                <p>LSD</p>
-                            </div>
-                            <i class="fa-solid fa-chart-simple text-green"></i>
-                        </div>
-                        <!-- Antrean Berikutnya -->
-                        <div class="queue-item">
-                            <div class="item-thumb">
-                                <i class="fa-solid fa-music"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>In This Shirt</h4>
-                                <p>The Irrepressibles</p>
-                            </div>
-                        </div>
-                        <div class="queue-item">
-                            <div class="item-thumb">
-                                <i class="fa-solid fa-music"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>Dark Paradise</h4>
-                                <p>Lana Del Rey</p>
-                            </div>
-                        </div>
-                        <div class="queue-item">
-                            <div class="item-thumb">
-                                <i class="fa-solid fa-music"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>Shine On You Crazy Diamond</h4>
-                                <p>Pink Floyd</p>
-                            </div>
-                        </div>
+                    <div
+                        class="queue-list"
+                        style="
+                            padding: 24px 0;
+                            text-align: center;
+                            color: var(--text-muted);
+                            font-size: 0.82rem;
+                        "
+                    >
+                        <i
+                            class="fa-solid fa-music"
+                            style="
+                                font-size: 1.4rem;
+                                margin-bottom: 8px;
+                                opacity: 0.4;
+                            "
+                        ></i>
+                        <p>No track playing right now</p>
                     </div>
                 </div>
             </aside>
         </div>
-
-        <!-- ================= BOTTOM MUSIC PLAYER ================= -->
-        <footer class="music-player">
-            <!-- Kiri: Info Lagu -->
-            <div class="player-left">
-                <div class="now-playing-box">
-                    <div class="item-thumb green-thumb">
-                        <i class="fa-solid fa-music"></i>
-                    </div>
-                    <div class="item-info">
-                        <h4>Genius (feat. Sia & Diplo)</h4>
-                        <p>LSD, Sia, Diplo</p>
-                    </div>
-                </div>
-                <button class="icon-btn heart-btn">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-            </div>
-
-            <!-- Tengah: Kontrol & Progress Bar -->
-            <div class="player-center">
-                <div class="playback-buttons">
-                    <button class="icon-btn">
-                        <i class="fa-solid fa-shuffle"></i>
-                    </button>
-                    <button class="icon-btn">
-                        <i class="fa-solid fa-backward-step"></i>
-                    </button>
-                    <button class="play-circle-btn">
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                    <button class="icon-btn">
-                        <i class="fa-solid fa-forward-step"></i>
-                    </button>
-                    <button class="icon-btn">
-                        <i class="fa-solid fa-repeat"></i>
-                    </button>
-                </div>
-                <div class="progress-wrapper">
-                    <span class="time-text">1:42</span>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: 45%"></div>
-                        <div class="progress-knob" style="left: 45%"></div>
-                    </div>
-                    <span class="time-text">3:13</span>
-                </div>
-            </div>
-
-            <!-- Kanan: Extra Controls -->
-            <div class="player-right">
-                <button
-                    class="icon-btn nav-link"
-                    data-target="lyrics"
-                    title="Lyrics"
-                >
-                    <i class="fa-regular fa-message"></i>
-                </button>
-                <button
-                    class="icon-btn nav-link"
-                    data-target="queue"
-                    title="Queue"
-                >
-                    <i class="fa-solid fa-list-ul"></i>
-                </button>
-                <button class="icon-btn" title="Connect to a device">
-                    <i class="fa-solid fa-desktop"></i>
-                </button>
-                <div class="volume-wrapper">
-                    <i class="fa-solid fa-volume-high"></i>
-                    <div class="volume-bar-bg">
-                        <div class="volume-bar-fill" style="width: 70%"></div>
-                    </div>
-                </div>
-            </div>
-        </footer>
 
         <!-- Load Script Utama -->
         <script src="js/app.js"></script>
