@@ -1,12 +1,14 @@
-<section class="home-view">
-    <!-- Hero Banner -->
-    <div class="hero-banner">
-        <h1>Hello, Jane!</h1>
-        <p>Discover your rhythm and set your music journey in motion.</p>
-    </div>
+<div class="home-view">
+    <!-- Hero banner -->
+    <section class="home-section">
+        <div class="hero-banner">
+            <h1>Hello, User!</h1>
+            <p>Discover your rhythm and set your music journey in motion.</p>
+        </div>
+    </section>
 
-    <!-- Section: Jump Back In -->
-    <div class="home-section">
+    <!-- Jump back in -->
+    <section class="home-section">
         <div class="section-header-large">
             <div>
                 <h2>Jump Back In</h2>
@@ -27,6 +29,7 @@
                     <p>Playlist</p>
                 </div>
             </div>
+
             <div class="jump-card nav-link" data-target="playlist">
                 <div class="jump-thumb">
                     <i class="fa-solid fa-compact-disc"></i>
@@ -36,6 +39,7 @@
                     <p>Playlist</p>
                 </div>
             </div>
+
             <div class="jump-card nav-link" data-target="album">
                 <div class="jump-thumb">
                     <i class="fa-solid fa-compact-disc"></i>
@@ -45,6 +49,7 @@
                     <p>Perunggu</p>
                 </div>
             </div>
+
             <div class="jump-card nav-link" data-target="playlist">
                 <div class="jump-thumb"><i class="fa-solid fa-music"></i></div>
                 <div class="jump-info">
@@ -52,6 +57,7 @@
                     <p>Playlist</p>
                 </div>
             </div>
+
             <div class="jump-card nav-link" data-target="album">
                 <div class="jump-thumb">
                     <i class="fa-solid fa-compact-disc"></i>
@@ -61,6 +67,7 @@
                     <p>Taylor Swift</p>
                 </div>
             </div>
+
             <div class="jump-card nav-link" data-target="album">
                 <div class="jump-thumb">
                     <i class="fa-solid fa-compact-disc"></i>
@@ -71,10 +78,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Section: Trending Songs -->
-    <div class="home-section">
+    <!-- Trending songs -->
+    <section class="home-section">
         <div class="section-header-large">
             <div>
                 <h2>Trending Songs</h2>
@@ -85,81 +92,129 @@
             >
         </div>
 
-        <div class="trending-grid">
-            <div class="trending-card">
-                <div class="trending-cover">
-                    <div class="circle-music-icon">
-                        <i class="fa-solid fa-music"></i>
+        <div class="carousel-wrapper">
+            <button
+                class="carousel-btn prev"
+                id="trending-prev"
+                aria-label="Scroll Left"
+            >
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="trending-grid" id="trending-carousel">
+                <div class="trending-card">
+                    <div class="trending-cover">
+                        <div class="circle-music-icon">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="trending-meta">
+                        <div>
+                            <h4>Escapism.</h4>
+                            <p>RAYE, 070 Shake</p>
+                        </div>
+                        <span class="duration">4:32</span>
                     </div>
                 </div>
-                <div class="trending-meta">
-                    <div style="overflow: hidden">
-                        <h4>Escapism.</h4>
-                        <p>RAYE, 070 Shake</p>
+
+                <div class="trending-card">
+                    <div class="trending-cover">
+                        <div class="circle-music-icon">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
                     </div>
-                    <span class="duration">4:32</span>
+                    <div class="trending-meta">
+                        <div>
+                            <h4>PILLOWTALK</h4>
+                            <p>ZAYN</p>
+                        </div>
+                        <span class="duration">3:23</span>
+                    </div>
+                </div>
+
+                <div class="trending-card">
+                    <div class="trending-cover">
+                        <div class="circle-music-icon">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="trending-meta">
+                        <div>
+                            <h4>Blinding Lights</h4>
+                            <p>The Weeknd</p>
+                        </div>
+                        <span class="duration">3:20</span>
+                    </div>
+                </div>
+
+                <div class="trending-card">
+                    <div class="trending-cover">
+                        <div class="circle-music-icon">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="trending-meta">
+                        <div>
+                            <h4>Love Story</h4>
+                            <p>Taylor Swift</p>
+                        </div>
+                        <span class="duration">3:55</span>
+                    </div>
+                </div>
+
+                <div class="trending-card">
+                    <div class="trending-cover">
+                        <div class="circle-music-icon">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="trending-meta">
+                        <div>
+                            <h4>Foto Kita Blur</h4>
+                            <p>Sal Priadi</p>
+                        </div>
+                        <span class="duration">4:12</span>
+                    </div>
+                </div>
+
+                <div class="trending-card">
+                    <div class="trending-cover">
+                        <div class="circle-music-icon">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="trending-meta">
+                        <div>
+                            <h4>33x</h4>
+                            <p>Perunggu</p>
+                        </div>
+                        <span class="duration">4:48</span>
+                    </div>
+                </div>
+
+                <div class="trending-card">
+                    <div class="trending-cover">
+                        <div class="circle-music-icon">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="trending-meta">
+                        <div>
+                            <h4>Starboy</h4>
+                            <p>The Weeknd</p>
+                        </div>
+                        <span class="duration">3:50</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="trending-card">
-                <div class="trending-cover">
-                    <div class="circle-music-icon">
-                        <i class="fa-solid fa-music"></i>
-                    </div>
-                </div>
-                <div class="trending-meta">
-                    <div style="overflow: hidden">
-                        <h4>PILLOWTALK</h4>
-                        <p>ZAYN</p>
-                    </div>
-                    <span class="duration">3:23</span>
-                </div>
-            </div>
-
-            <div class="trending-card">
-                <div class="trending-cover">
-                    <div class="circle-music-icon">
-                        <i class="fa-solid fa-music"></i>
-                    </div>
-                </div>
-                <div class="trending-meta">
-                    <div style="overflow: hidden">
-                        <h4>Blinding Lights</h4>
-                        <p>The Weeknd</p>
-                    </div>
-                    <span class="duration">3:20</span>
-                </div>
-            </div>
-
-            <div class="trending-card">
-                <div class="trending-cover">
-                    <div class="circle-music-icon">
-                        <i class="fa-solid fa-music"></i>
-                    </div>
-                </div>
-                <div class="trending-meta">
-                    <div style="overflow: hidden">
-                        <h4>Love Story</h4>
-                        <p>Taylor Swift</p>
-                    </div>
-                    <span class="duration">3:55</span>
-                </div>
-            </div>
-
-            <div class="trending-card">
-                <div class="trending-cover">
-                    <div class="circle-music-icon">
-                        <i class="fa-solid fa-music"></i>
-                    </div>
-                </div>
-                <div class="trending-meta">
-                    <div style="overflow: hidden">
-                        <h4>Foto Kita Blur</h4>
-                        <p>Sal Priadi</p>
-                    </div>
-                    <span class="duration">4:12</span>
-                </div>
-            </div>
+            <button
+                class="carousel-btn next"
+                id="trending-next"
+                aria-label="Scroll Right"
+            >
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
-    </div>
-</section>
+    </section>
+</div>

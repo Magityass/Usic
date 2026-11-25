@@ -20,8 +20,8 @@
         <link rel="stylesheet" href="css/user-system.css" />
     </head>
     <body>
-        <div class="app-layout">
-            <!-- Sidebar Kiri -->
+        <div class="app-layout" id="app-layout">
+            <!-- Sidebar kiri -->
             <aside class="sidebar-left">
                 <div class="brand-logo">
                     <div class="logo-icon">
@@ -119,15 +119,23 @@
                 </div>
             </aside>
 
-            <!-- Konten Utama -->
+            <!-- Area tengah -->
             <div class="center-wrapper">
                 <header class="top-bar">
                     <div class="top-left">
                         <div class="nav-arrows">
-                            <button class="icon-btn">
+                            <button
+                                class="icon-btn"
+                                id="btn-back"
+                                aria-label="Back"
+                            >
                                 <i class="fa-solid fa-arrow-left"></i>
                             </button>
-                            <button class="icon-btn">
+                            <button
+                                class="icon-btn"
+                                id="btn-forward"
+                                aria-label="Forward"
+                            >
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </div>
@@ -141,7 +149,10 @@
                     </div>
 
                     <div class="top-right">
-                        <button class="icon-btn notif-btn">
+                        <button
+                            class="icon-btn notif-btn"
+                            aria-label="Notifications"
+                        >
                             <i class="fa-regular fa-bell"></i>
                         </button>
                         <div
@@ -151,7 +162,7 @@
                             <div class="avatar-circle">
                                 <i class="fa-regular fa-user"></i>
                             </div>
-                            <span>Alex Rivera</span>
+                            <span>User</span>
                             <i
                                 class="fa-solid fa-chevron-down"
                                 style="font-size: 0.7rem; color: #999"
@@ -160,72 +171,73 @@
                     </div>
                 </header>
 
-                <!-- Dynamic Page Container -->
+                <!-- Konten halaman dinamis -->
                 <main id="main-content"></main>
             </div>
 
-            <!-- Sidebar Kanan -->
-            <aside class="sidebar-right">
-                <div class="right-panel-card">
-                    <div class="section-header">
-                        <h3>Friends Activity</h3>
-                        <a href="#" class="see-all">See all</a>
-                    </div>
-                    <div class="friend-list">
-                        <div class="friend-item">
-                            <div class="item-thumb relative">
-                                <i class="fa-solid fa-compact-disc"></i>
-                                <span class="badge-user"
-                                    ><i class="fa-solid fa-user"></i
-                                ></span>
-                            </div>
-                            <div class="item-info">
-                                <h4>Anna is listening to Time</h4>
-                                <p>Pink Floyd</p>
-                            </div>
-                            <span class="time-ago">8m ago</span>
+            <!-- Sidebar kanan (muncul saat lagu diklik) -->
+            <aside class="sidebar-right" id="sidebar-right">
+                <div class="now-playing-panel">
+                    <div class="vinyl-cover">
+                        <div class="vinyl-disc" id="vinyl-disc">
+                            <div class="vinyl-center"></div>
                         </div>
-                        <div class="friend-item">
-                            <div class="item-thumb relative">
-                                <i class="fa-solid fa-compact-disc"></i>
-                                <span class="badge-user"
-                                    ><i class="fa-solid fa-user"></i
-                                ></span>
-                            </div>
-                            <div class="item-info">
-                                <h4>Frank liked Frozen</h4>
-                                <p>Madonna</p>
-                            </div>
-                            <span class="time-ago">4h ago</span>
+                        <div class="vinyl-info">
+                            <h3 id="np-title">Thunderclouds</h3>
+                            <p id="np-artist">LSD (Sia, Diplo, Labrinth)</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="right-panel-card queue-card">
-                    <div class="section-header">
-                        <h3>Queue</h3>
-                        <a href="#" class="see-all nav-link" data-target="queue"
-                            >See all</a
+                    <div class="np-controls">
+                        <button
+                            class="np-btn like-btn"
+                            id="np-like"
+                            aria-label="Like"
                         >
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        <button class="np-btn" aria-label="Shuffle">
+                            <i class="fa-solid fa-shuffle"></i>
+                        </button>
+                        <button
+                            class="np-btn"
+                            id="np-prev"
+                            aria-label="Previous"
+                        >
+                            <i class="fa-solid fa-backward-step"></i>
+                        </button>
+                        <button
+                            class="np-play-btn"
+                            id="np-play"
+                            aria-label="Play/Pause"
+                        >
+                            <i class="fa-solid fa-pause"></i>
+                        </button>
+                        <button class="np-btn" id="np-next" aria-label="Next">
+                            <i class="fa-solid fa-forward-step"></i>
+                        </button>
+                        <button class="np-btn" aria-label="Repeat">
+                            <i class="fa-solid fa-repeat"></i>
+                        </button>
+                        <button
+                            class="np-btn nav-link"
+                            data-target="lyrics"
+                            aria-label="Lyrics"
+                        >
+                            <i class="fa-regular fa-file-lines"></i>
+                        </button>
                     </div>
-                    <div
-                        class="queue-list"
-                        style="
-                            padding: 24px 0;
-                            text-align: center;
-                            color: var(--text-muted);
-                            font-size: 0.82rem;
-                        "
-                    >
-                        <i
-                            class="fa-solid fa-music"
-                            style="
-                                font-size: 1.4rem;
-                                margin-bottom: 8px;
-                                opacity: 0.4;
-                            "
-                        ></i>
-                        <p>No track playing right now</p>
+
+                    <div class="np-progress">
+                        <span id="np-current">0:00</span>
+                        <div class="np-bar-bg">
+                            <div
+                                class="np-bar-fill"
+                                id="np-bar-fill"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <span id="np-duration">3:37</span>
                     </div>
                 </div>
             </aside>
