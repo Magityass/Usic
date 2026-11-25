@@ -15,6 +15,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const npPlayBtn = document.getElementById("np-play");
   const miniPlayBtn = document.getElementById("mini-play");
   const npLikeBtn = document.getElementById("np-like");
+  const themeToggleBtn = document.getElementById("theme-toggle");
+
+  const THEME_KEY = "usic_theme";
+
+  // Terapkan tema dark atau light dan ubah ikon matahari/bulan
+  const applyTheme = (theme) => {
+    const isLight = theme === "light";
+    document.documentElement.setAttribute(
+      "data-theme",
+      isLight ? "light" : "dark",
+    );
+    if (themeToggleBtn) {
+      themeToggleBtn.innerHTML = isLight
+        ? `<i class="fa-regular fa-moon"></i>`
+        : `<i class="fa-regular fa-sun"></i>`;
+    }
+    localStorage.setItem(THEME_KEY, isLight ? "light" : "dark");
+  };
+
+  // Muat tema terakhir yang disimpan user
+  applyTheme(localStorage.getItem(THEME_KEY) || "dark");
 
   // Status pemutar, indeks lagu aktif, seek, dan timer progress
   let isPaused = false;
@@ -182,6 +203,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Satu event listener untuk menangani semua aksi klik di halaman
   document.body.addEventListener("click", (e) => {
+    // Toggle Dark Mode / Light Mode
+    if (e.target.closest("#theme-toggle")) {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      applyTheme(currentTheme === "light" ? "dark" : "light");
+      return;
+    }
+
     // Pindah halaman saat elemen .nav-link diklik
     const link = e.target.closest(".nav-link");
     if (link) {
