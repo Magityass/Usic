@@ -108,6 +108,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    min-width: 0;
 }
 
 .trending-grid {
@@ -288,13 +289,14 @@
     }
 
     .trending-card {
-        flex: 0 0 150px;
-        width: 150px;
-        min-width: 150px;
+        flex: 0 0 calc((100% - 16px) / 2);
+        width: calc((100% - 16px) / 2);
+        min-width: 0;
     }
 
     .trending-grid {
         gap: 16px;
+        width: 100%;
     }
 
     .carousel-btn {
