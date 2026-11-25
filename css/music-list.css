@@ -29,7 +29,7 @@
     font-size: 0.95rem;
 }
 
-/* Header tiap bagian (judul + subjudul + see all) */
+/* Header tiap bagian */
 .section-header-large {
     display: flex;
     justify-content: space-between;
@@ -102,7 +102,7 @@
     color: var(--text-muted);
 }
 
-/* Wadah carousel Trending Songs (scroll horizontal tanpa scrollbar) */
+/* Wadah carousel Trending Songs */
 .carousel-wrapper {
     position: relative;
     display: flex;
@@ -125,7 +125,7 @@
     display: none;
 }
 
-/* Lebar kartu lagu dikunci biar tidak menyusut saat sidebar kanan muncul */
+/* Ukuran kartu lagu dikunci agar konsisten sebelum dan sesudah dipencet */
 .trending-card {
     flex: 0 0 210px;
     width: 210px;
@@ -205,7 +205,7 @@
     flex-shrink: 0;
 }
 
-/* Panah geser disembunyikan dulu, baru muncul saat area carousel di-hover */
+/* Panah geser muncul saat area carousel di-hover */
 .carousel-btn {
     position: absolute;
     top: 38%;
@@ -248,7 +248,7 @@
     right: -14px;
 }
 
-/* Penyesuaian ukuran kartu untuk layar laptop kecil, tablet, dan HP */
+/* Responsif kartu home */
 @media (max-width: 1150px) {
     .trending-card {
         flex: 0 0 190px;

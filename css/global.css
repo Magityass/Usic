@@ -1,3 +1,4 @@
+/* Warna & skala dasar */
 :root {
     --bg-base: #121212;
     --bg-sidebar: #161616;
@@ -29,6 +30,7 @@ body {
     height: 100vh;
 }
 
+/* Layout utama */
 .app-layout {
     display: grid;
     grid-template-columns: 265px minmax(0, 1fr);
@@ -41,6 +43,7 @@ body {
     grid-template-columns: 265px minmax(0, 1fr) 330px;
 }
 
+/* Sidebar kiri */
 .sidebar-left {
     background-color: var(--bg-sidebar);
     border-right: 1px solid var(--border-subtle);
@@ -181,6 +184,7 @@ body {
     margin-top: 2px;
 }
 
+/* Header & area konten utama */
 .center-wrapper {
     display: flex;
     flex-direction: column;
@@ -210,11 +214,6 @@ body {
     align-items: center;
     gap: 14px;
     justify-self: end;
-}
-
-.nav-arrows {
-    display: flex;
-    gap: 10px;
 }
 
 .icon-btn {
@@ -291,6 +290,7 @@ body {
     border-radius: 4px;
 }
 
+/* Sidebar kanan (now playing) */
 .sidebar-right {
     display: none;
     background-color: var(--bg-base);
@@ -309,6 +309,25 @@ body {
     display: flex;
     flex-direction: column;
     gap: 14px;
+}
+
+.np-close-btn {
+    display: none;
+    align-self: flex-end;
+    background-color: #242424;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.np-close-btn:hover {
+    background-color: #303030;
 }
 
 .vinyl-cover {
@@ -471,6 +490,12 @@ body {
     border-radius: 2px;
 }
 
+/* Mini player disembunyikan di desktop/tablet */
+.mini-player {
+    display: none;
+}
+
+/* Responsif layout utama */
 @media (max-width: 1150px) {
     .app-layout,
     .app-layout.is-playing {
@@ -559,12 +584,156 @@ body {
         padding: 0 16px;
         grid-template-columns: auto 1fr auto;
     }
+
+    .user-profile-pill span,
+    .user-profile-pill .fa-chevron-down {
+        display: none;
+    }
+
     .top-search-box {
         max-width: 210px;
         justify-self: center;
     }
 
     #main-content {
-        padding: 8px 16px 24px 16px;
+        padding: 8px 16px 84px 16px;
+    }
+
+    /* Player penuh saat lagu dipencet di HP */
+    .app-layout.is-playing .sidebar-right {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 54px);
+        border-left: none;
+        z-index: 25;
+        justify-content: center;
+    }
+
+    .app-layout.is-playing .np-close-btn {
+        display: flex;
+    }
+
+    /* Mini player muncul di atas bottom nav saat di-minimize */
+    .app-layout.is-playing.is-minimized .sidebar-right {
+        display: none;
+    }
+
+    .app-layout.is-playing.is-minimized .mini-player {
+        display: flex;
+        position: fixed;
+        bottom: 54px;
+        left: 0;
+        width: 100%;
+        height: 56px;
+        background-color: #1d1d1d;
+        border-top: 1px solid var(--border-subtle);
+        padding: 8px 14px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        z-index: 19;
+    }
+
+    .mini-player-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .mini-thumb {
+        width: 38px;
+        height: 38px;
+        border-radius: 6px;
+        background-color: #2b2b2b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+
+    .mini-text {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .mini-text h4 {
+        font-size: 0.84rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mini-text p {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mini-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .mini-ctrl-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        cursor: pointer;
+    }
+
+    .mini-ctrl-btn:hover {
+        color: var(--text-main);
+    }
+
+    .mini-play-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background-color: var(--accent-green);
+        color: #000;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .mini-progress-bg {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #2c2c2c;
+        overflow: hidden;
+    }
+
+    .mini-progress-fill {
+        height: 100%;
+        width: 0%;
+        background-color: var(--accent-green);
+        transition: width 0.25s linear;
     }
 }

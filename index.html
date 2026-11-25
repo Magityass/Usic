@@ -162,6 +162,14 @@
             <!-- Sidebar kanan (muncul saat lagu diklik) -->
             <aside class="sidebar-right" id="sidebar-right">
                 <div class="now-playing-panel">
+                    <button
+                        class="np-close-btn"
+                        id="np-close"
+                        aria-label="Minimize Player"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
                     <div class="vinyl-cover">
                         <div class="vinyl-disc" id="vinyl-disc">
                             <div class="vinyl-center"></div>
@@ -225,6 +233,49 @@
                     </div>
                 </div>
             </aside>
+
+            <!-- Mini player di HP saat panel penuh di-minimize -->
+            <div class="mini-player" id="mini-player">
+                <div class="mini-player-info" id="mini-player-expand">
+                    <div class="mini-thumb">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <div class="mini-text">
+                        <h4 id="mini-title">Thunderclouds</h4>
+                        <p id="mini-artist">LSD (Sia, Diplo, Labrinth)</p>
+                    </div>
+                </div>
+                <div class="mini-controls">
+                    <button
+                        class="mini-ctrl-btn"
+                        id="mini-prev"
+                        aria-label="Previous"
+                    >
+                        <i class="fa-solid fa-backward-step"></i>
+                    </button>
+                    <button
+                        class="mini-play-btn"
+                        id="mini-play"
+                        aria-label="Play/Pause"
+                    >
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
+                    <button
+                        class="mini-ctrl-btn"
+                        id="mini-next"
+                        aria-label="Next"
+                    >
+                        <i class="fa-solid fa-forward-step"></i>
+                    </button>
+                </div>
+                <div class="mini-progress-bg">
+                    <div
+                        class="mini-progress-fill"
+                        id="mini-bar-fill"
+                        style="width: 0%"
+                    ></div>
+                </div>
+            </div>
         </div>
 
         <script src="js/app.js"></script>
