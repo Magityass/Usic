@@ -121,20 +121,7 @@ body {
     transition: all 0.2s;
 }
 
-.main-nav .nav-copy {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
 .main-nav .nav-label {
-    line-height: 1.2;
-}
-
-.main-nav .nav-description {
-    color: var(--text-muted);
-    font-size: 0.66rem;
-    font-weight: 400;
     line-height: 1.2;
 }
 
@@ -679,10 +666,6 @@ body {
         display: none;
     }
 
-    .main-nav .nav-copy {
-        display: none;
-    }
-
     .main-nav .nav-icon {
         display: inline-block;
         font-size: 1.05rem;
@@ -753,20 +736,6 @@ body {
 
     .main-nav {
         width: 100%;
-    }
-
-    .main-nav .nav-copy {
-        display: flex;
-    }
-
-    .main-nav .nav-label {
-        display: block;
-        font-size: 0.62rem;
-        line-height: 1;
-    }
-
-    .main-nav .nav-description {
-        display: none;
     }
 
     .main-nav li {
