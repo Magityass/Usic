@@ -148,6 +148,35 @@ body {
     color: var(--text-muted);
 }
 
+.library-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.library-add-button {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition:
+        color 0.2s,
+        background-color 0.2s;
+}
+
+.library-add-button:hover,
+.library-add-button:focus-visible {
+    color: var(--text-main);
+    background: var(--bg-elevated);
+}
+
 .see-all {
     color: var(--text-muted);
     text-decoration: none;
@@ -458,6 +487,62 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 2px 4px;
+}
+
+.player-library-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    font-size: 0.76rem;
+}
+
+.player-library-picker[hidden] {
+    display: none;
+}
+
+.player-library-picker > label {
+    font-weight: 600;
+}
+
+.player-library-picker-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.player-library-picker-controls select {
+    flex: 1;
+    min-width: 0;
+    padding: 8px;
+    color: var(--text-main);
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 7px;
+    font-size: 0.76rem;
+}
+
+.player-library-picker-controls button {
+    padding: 8px 11px;
+    color: #000;
+    background: var(--accent-green);
+    border: 0;
+    border-radius: 7px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#player-library-status {
+    min-height: 1em;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+#player-library-status.is-error {
+    color: #ff8585;
 }
 
 .np-btn {

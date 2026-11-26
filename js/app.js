@@ -15,10 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const npPlayBtn = document.getElementById("np-play");
   const miniPlayBtn = document.getElementById("mini-play");
   const npLikeBtn = document.getElementById("np-like");
+  const npAddToLibraryBtn = document.getElementById("np-add-to-library");
+  const playerLibraryPicker = document.getElementById("player-library-picker");
+  const playerLibrarySelect = document.getElementById("player-library-select");
+  const playerLibraryStatus = document.getElementById("player-library-status");
   const themeToggleBtn = document.getElementById("theme-toggle");
 
   const THEME_KEY = "usic_theme";
-  const LIBRARY_KEY = "usic_saved_tracks";
+  const LIBRARY_KEY = "usic_named_libraries";
+  const LEGACY_LIBRARY_KEY = "usic_saved_tracks";
+  let activeLibraryId = null;
 
   // Data contoh album beserta lagu yang ditampilkan pada halaman Album.
   const albums = [
@@ -85,15 +91,40 @@ document.addEventListener("DOMContentLoaded", () => {
       return entities[character];
     });
 
-  // Baca koleksi dari LocalStorage dan laporkan jika formatnya tidak valid.
-  const readLibrary = () => {
-    const storedTracks = localStorage.getItem(LIBRARY_KEY);
-    if (storedTracks === null) return [];
+  // Baca koleksi bernama; migrasikan lagu lama ke koleksi default bila ada.
+  const readLibraries = () => {
+    const storedLibraries = localStorage.getItem(LIBRARY_KEY);
+    if (storedLibraries !== null) {
+      const libraries = JSON.parse(storedLibraries);
+      if (
+        !Array.isArray(libraries) ||
+        libraries.some(
+          (library) =>
+            !library ||
+            typeof library.id !== "string" ||
+            typeof library.name !== "string" ||
+            !Array.isArray(library.tracks) ||
+            library.tracks.some(
+              (track) =>
+                !track ||
+                typeof track.id !== "string" ||
+                typeof track.title !== "string" ||
+                typeof track.artist !== "string",
+            ),
+        )
+      ) {
+        throw new Error("Data Library tidak valid.");
+      }
+      return ensureLikedSongsLibrary(libraries);
+    }
 
-    const tracks = JSON.parse(storedTracks);
+    const oldData = localStorage.getItem(LEGACY_LIBRARY_KEY);
+    if (oldData === null) return ensureLikedSongsLibrary([]);
+
+    const oldTracks = JSON.parse(oldData);
     if (
-      !Array.isArray(tracks) ||
-      tracks.some(
+      !Array.isArray(oldTracks) ||
+      oldTracks.some(
         (track) =>
           !track ||
           typeof track.id !== "string" ||
@@ -101,9 +132,66 @@ document.addEventListener("DOMContentLoaded", () => {
           typeof track.artist !== "string",
       )
     ) {
-      throw new Error("Data Library tidak valid.");
+      throw new Error("Data Library lama tidak valid.");
     }
-    return tracks;
+    if (!oldTracks.length) return ensureLikedSongsLibrary([]);
+
+    const migratedLibraries = [
+      { id: "library-default", name: "Library Saya", tracks: oldTracks },
+    ];
+    return ensureLikedSongsLibrary(migratedLibraries);
+  };
+
+  const writeLibraries = (libraries) => {
+    localStorage.setItem(LIBRARY_KEY, JSON.stringify(libraries));
+  };
+
+  // Pastikan Library sistem Liked Songs selalu tersedia dan tersimpan.
+  const ensureLikedSongsLibrary = (libraries) => {
+    if (!libraries.some((library) => library.id === "liked-songs")) {
+      libraries.unshift({
+        id: "liked-songs",
+        name: "Liked Songs",
+        tracks: [],
+        isSystem: true,
+      });
+      writeLibraries(libraries);
+    }
+    return libraries;
+  };
+
+  const getCoverClass = (cover) =>
+    ["cover-violet", "cover-blue", "cover-orange", "cover-green"].includes(
+      cover,
+    )
+      ? cover
+      : "cover-violet";
+
+  // Tampilkan koleksi yang sudah dibuat pada sidebar YOUR LIBRARY.
+  const renderSidebarLibraries = () => {
+    const libraryList = document.getElementById("user-library-list");
+    if (!libraryList) return;
+
+    try {
+      const libraries = readLibraries();
+      libraryList.innerHTML = libraries.length
+        ? libraries
+            .map(
+              (library) => `
+                <li class="library-item nav-link" data-target="library" data-library-id="${escapeHTML(library.id)}">
+                  <div class="item-thumb"><i class="fa-solid fa-music"></i></div>
+                  <div class="item-info">
+                    <h4>${escapeHTML(library.name)}</h4>
+                    <p>${library.tracks.length} lagu</p>
+                  </div>
+                </li>
+              `,
+            )
+            .join("")
+        : `<li class="library-empty">Belum ada Library</li>`;
+    } catch (error) {
+      libraryList.innerHTML = `<li class="library-empty is-error">${escapeHTML(error.message)}</li>`;
+    }
   };
 
   // Tampilkan album mock data sebagai grid kartu yang dapat dibuka.
@@ -130,15 +218,15 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   };
 
-  // Tampilkan detail album dan status tombol sesuai isi Library.
+  // Tampilkan detail album dengan pilihan koleksi tujuan untuk setiap lagu.
   const renderAlbumDetail = (album, message = "") => {
     const albumContent = document.getElementById("album-content");
     if (!albumContent) return;
 
-    let savedTrackIds = [];
+    let libraries = [];
     let storageError = "";
     try {
-      savedTrackIds = readLibrary().map((track) => track.id);
+      libraries = readLibraries();
     } catch (error) {
       storageError = error.message;
     }
@@ -158,7 +246,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="track-list">
         ${album.tracks
           .map((track) => {
-            const isSaved = savedTrackIds.includes(track.id);
             return `
               <article class="track-row">
                 <div class="track-meta">
@@ -167,97 +254,215 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <div class="track-actions">
                   <span class="track-duration">${escapeHTML(track.duration)}</span>
+                  <label class="sr-only" for="library-target-${escapeHTML(track.id)}">Pilih Library untuk ${escapeHTML(track.title)}</label>
+                  <select class="library-target-select" id="library-target-${escapeHTML(track.id)}" data-library-for="${escapeHTML(track.id)}" ${libraries.length ? "" : "disabled"}>
+                    <option value="">Pilih Library</option>
+                    ${libraries
+                      .map(
+                        (library) => `
+                          <option value="${escapeHTML(library.id)}" ${library.id === activeLibraryId ? "selected" : ""}>${escapeHTML(library.name)}</option>
+                        `,
+                      )
+                      .join("")}
+                  </select>
                   <button
                     class="save-track-button"
                     type="button"
-                    data-save-track="${escapeHTML(track.id)}"
-                    ${isSaved ? "disabled" : ""}
-                  >${isSaved ? "Tersimpan" : "Simpan ke Library"}</button>
+                    data-add-track="${escapeHTML(track.id)}"
+                    ${libraries.length ? "" : "disabled"}
+                  >Tambah</button>
                 </div>
               </article>
             `;
           })
           .join("")}
       </div>
-      <p class="feature-message ${storageError ? "is-error" : ""}" role="status" aria-live="polite">${escapeHTML(storageError || message)}</p>
+      <p class="feature-message ${storageError ? "is-error" : ""}" role="status" aria-live="polite">${escapeHTML(storageError || message || (libraries.length ? "" : "Buat Library terlebih dahulu dari halaman Library."))}</p>
     `;
   };
 
-  // Simpan lagu ke LocalStorage dan cegah lagu yang sama tersimpan dua kali.
-  const saveTrackToLibrary = (trackId) => {
+  // Masukkan lagu ke koleksi yang dipilih tanpa menggandakan lagu.
+  const addTrackToLibrary = (trackId, libraryId) => {
     const album = albums.find((item) =>
       item.tracks.some((track) => track.id === trackId),
     );
     const track = album?.tracks.find((item) => item.id === trackId);
     if (!album || !track) return;
+    if (!libraryId) {
+      renderAlbumDetail(album, "Pilih Library tujuan terlebih dahulu.");
+      return;
+    }
 
     try {
-      const savedTracks = readLibrary();
-      if (savedTracks.some((item) => item.id === track.id)) {
-        renderAlbumDetail(album, "Lagu ini sudah ada di Library.");
+      const libraries = readLibraries();
+      const library = libraries.find((item) => item.id === libraryId);
+      if (!library) {
+        renderAlbumDetail(album, "Library tujuan tidak ditemukan.");
+        return;
+      }
+      if (library.tracks.some((item) => item.id === track.id)) {
+        activeLibraryId = library.id;
+        renderAlbumDetail(album, `Lagu ini sudah ada di "${library.name}".`);
         return;
       }
 
-      savedTracks.push({
+      library.tracks.push({
         ...track,
         artist: album.artist,
         album: album.title,
         year: album.year,
         cover: album.cover,
       });
-      localStorage.setItem(LIBRARY_KEY, JSON.stringify(savedTracks));
-      renderAlbumDetail(album, "Lagu berhasil disimpan ke Library.");
+      writeLibraries(libraries);
+      activeLibraryId = library.id;
+      renderSidebarLibraries();
+      syncCurrentTrackLike();
+      renderAlbumDetail(album, `Lagu ditambahkan ke "${library.name}".`);
     } catch (error) {
-      renderAlbumDetail(album, `Gagal menyimpan lagu: ${error.message}`);
+      renderAlbumDetail(album, `Gagal menambahkan lagu: ${error.message}`);
       document.querySelector("#album-content .feature-message")?.classList.add("is-error");
     }
   };
 
-  // Render koleksi yang tersimpan atau pesan jika belum ada lagu.
-  const renderLibrary = (message = "") => {
+  // Render daftar koleksi bernama atau lagu di koleksi yang sedang dibuka.
+  const renderLibraryPage = (message = "", isError = false) => {
     const libraryContent = document.getElementById("library-content");
     if (!libraryContent) return;
 
+    let libraries;
     try {
-      const savedTracks = readLibrary();
-      libraryContent.innerHTML = savedTracks.length
-        ? `
-          <div class="saved-track-list">
-            ${savedTracks
+      libraries = readLibraries();
+    } catch (error) {
+      libraries = [];
+      message = `Gagal membaca Library: ${error.message}`;
+      isError = true;
+    }
+
+    const statusMessage = message
+      ? `<p class="feature-message ${isError ? "is-error" : ""}" role="${isError ? "alert" : "status"}" aria-live="polite">${escapeHTML(message)}</p>`
+      : "";
+    const library = libraries.find((item) => item.id === activeLibraryId);
+
+    if (activeLibraryId && !library) activeLibraryId = null;
+
+    if (library) {
+      libraryContent.innerHTML = `
+        <button class="text-button" type="button" data-show-libraries>&larr; Semua Library</button>
+        <header class="library-detail-header">
+          <div class="item-thumb"><i class="fa-solid fa-music"></i></div>
+          <div>
+            <p class="eyebrow">LIBRARY</p>
+            <h2>${escapeHTML(library.name)}</h2>
+            <p>${library.tracks.length} lagu</p>
+          </div>
+        </header>
+        ${
+          library.tracks.length
+            ? `<div class="saved-track-list">
+                ${library.tracks
+                  .map(
+                    (track) => `
+                      <article class="saved-track-row">
+                        <span class="album-cover ${getCoverClass(track.cover)}" aria-hidden="true">
+                          <span class="album-art-title">${escapeHTML(track.album || "Library")}</span>
+                        </span>
+                        <div class="saved-track-meta">
+                          <h2>${escapeHTML(track.title)}</h2>
+                          <p>${escapeHTML(track.artist)} &middot; ${escapeHTML(track.album || "Album")} (${escapeHTML(track.year || "")})</p>
+                        </div>
+                        <button class="remove-track-button" type="button" data-remove-track="${escapeHTML(track.id)}" data-from-library="${escapeHTML(library.id)}">Hapus</button>
+                      </article>
+                    `,
+                  )
+                  .join("")}
+              </div>`
+            : `<p class="empty-library">Library ini masih kosong. Buka Album untuk memilih lagu yang ingin ditambahkan.</p>`
+        }
+        ${statusMessage}
+      `;
+      return;
+    }
+
+    libraryContent.innerHTML = `
+      <form class="create-library-form" id="create-library-form">
+        <label for="library-name">Buat Library baru</label>
+        <div class="create-library-controls">
+          <input id="library-name" name="libraryName" type="text" maxlength="40" placeholder="Contoh: Lagu Favorit" required>
+          <button class="create-library-button" type="submit">Buat Library</button>
+        </div>
+      </form>
+      ${statusMessage}
+      ${
+        libraries.length
+          ? `<div class="library-collection-grid">
+              ${libraries
               .map(
-                (track) => `
-                  <article class="saved-track-row">
-                    <span class="album-cover ${escapeHTML(track.cover || "cover-violet")}" aria-hidden="true">
-                      <span class="album-art-title">${escapeHTML(track.album || "Library")}</span>
-                    </span>
-                    <div class="saved-track-meta">
-                      <h2>${escapeHTML(track.title)}</h2>
-                      <p>${escapeHTML(track.artist)} &middot; ${escapeHTML(track.album || "Album")} (${escapeHTML(track.year || "")})</p>
-                    </div>
-                    <button class="remove-track-button" type="button" data-remove-track="${escapeHTML(track.id)}">Hapus</button>
-                  </article>
-                `,
+                  (item) => `
+                    <button class="library-collection-card" type="button" data-open-library="${escapeHTML(item.id)}">
+                      <span class="collection-icon"><i class="fa-solid fa-music"></i></span>
+                      <span class="collection-card-info">
+                        <strong>${escapeHTML(item.name)}</strong>
+                        <span>${item.tracks.length} lagu</span>
+                      </span>
+                    </button>
+                  `,
               )
               .join("")}
-          </div>
-          <p class="feature-message" role="status" aria-live="polite">${escapeHTML(message)}</p>
-        `
-        : `<p class="empty-library">Library masih kosong. Simpan lagu dari halaman Album untuk mulai mengisi koleksimu.</p>`;
+            </div>`
+          : `<p class="empty-library">Belum ada Library. Buat Library dengan nama di atas, lalu tambahkan lagu dari halaman Album.</p>`
+      }
+    `;
+  };
+
+  // Buat koleksi bernama agar dapat dipilih dari sidebar dan halaman Album.
+  const createLibrary = (name) => {
+    try {
+      const trimmedName = name.trim();
+      if (!trimmedName) {
+        renderLibraryPage("Nama Library tidak boleh kosong.", true);
+        return;
+      }
+
+      const libraries = readLibraries();
+      if (
+        libraries.some(
+          (library) => library.name.toLowerCase() === trimmedName.toLowerCase(),
+        )
+      ) {
+        renderLibraryPage("Nama Library tersebut sudah digunakan.", true);
+        return;
+      }
+
+      const library = {
+        id: `library-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: trimmedName,
+        tracks: [],
+      };
+      libraries.push(library);
+      writeLibraries(libraries);
+      activeLibraryId = library.id;
+      renderSidebarLibraries();
+      renderLibraryPage(`Library "${library.name}" berhasil dibuat.`);
     } catch (error) {
-      libraryContent.innerHTML = `<p class="feature-message is-error" role="alert">Gagal membaca Library: ${escapeHTML(error.message)}</p>`;
+      renderLibraryPage(`Gagal membuat Library: ${error.message}`, true);
     }
   };
 
-  // Hapus lagu berdasarkan ID lalu perbarui tampilan Library.
-  const removeTrackFromLibrary = (trackId) => {
+  // Hapus lagu hanya dari Library tempat lagu tersebut tersimpan.
+  const removeTrackFromLibrary = (trackId, libraryId) => {
     try {
-      const savedTracks = readLibrary();
-      const updatedTracks = savedTracks.filter((track) => track.id !== trackId);
-      localStorage.setItem(LIBRARY_KEY, JSON.stringify(updatedTracks));
-      renderLibrary("Lagu berhasil dihapus dari Library.");
+      const libraries = readLibraries();
+      const library = libraries.find((item) => item.id === libraryId);
+      if (!library) throw new Error("Library tidak ditemukan.");
+
+      library.tracks = library.tracks.filter((track) => track.id !== trackId);
+      writeLibraries(libraries);
+      activeLibraryId = library.id;
+      renderSidebarLibraries();
+      if (library.id === "liked-songs") syncCurrentTrackLike();
+      renderLibraryPage(`Lagu dihapus dari "${library.name}".`);
     } catch (error) {
-      renderLibrary(`Gagal menghapus lagu: ${error.message}`);
-      document.querySelector("#library-content .feature-message")?.classList.add("is-error");
+      renderLibraryPage(`Gagal menghapus lagu: ${error.message}`, true);
     }
   };
 
@@ -282,6 +487,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Status pemutar, indeks lagu aktif, seek, dan timer progress
   let isPaused = false;
   let isLiked = false;
+  let currentTrack = null;
   let isSeeking = false;
   let currentTrackIndex = -1;
   let elapsedSeconds = 0;
@@ -292,11 +498,148 @@ document.addEventListener("DOMContentLoaded", () => {
   const getTrackElements = () =>
     Array.from(document.querySelectorAll(".trending-card"));
 
-  const parseTrackCard = (card) => ({
-    title: card.querySelector("h4")?.textContent.trim() || "Unknown",
-    artist: card.querySelector("p")?.textContent.trim() || "Unknown",
-    duration: card.querySelector(".duration")?.textContent.trim() || "3:30",
-  });
+  const parseTrackCard = (card) => {
+    const title = card.querySelector("h4")?.textContent.trim() || "Unknown";
+    const artist = card.querySelector("p")?.textContent.trim() || "Unknown";
+    return {
+      id: card.dataset.trackId || `${artist.toLowerCase()}::${title.toLowerCase()}`,
+      title,
+      artist,
+      duration: card.querySelector(".duration")?.textContent.trim() || "3:30",
+    };
+  };
+
+  const setPlayerLibraryStatus = (message = "", isError = false) => {
+    if (!playerLibraryStatus) return;
+    playerLibraryStatus.textContent = message;
+    playerLibraryStatus.classList.toggle("is-error", isError);
+  };
+
+  const updateLikeButton = (liked) => {
+    isLiked = liked;
+    if (!npLikeBtn) return;
+    npLikeBtn.classList.toggle("liked", isLiked);
+    npLikeBtn.setAttribute(
+      "aria-pressed",
+      isLiked ? "true" : "false",
+    );
+    npLikeBtn.innerHTML = isLiked
+      ? `<i class="fa-solid fa-heart"></i>`
+      : `<i class="fa-regular fa-heart"></i>`;
+  };
+
+  // Sinkronkan ikon hati dengan isi Library Liked Songs.
+  const syncCurrentTrackLike = () => {
+    if (!currentTrack) {
+      updateLikeButton(false);
+      return;
+    }
+
+    try {
+      const likedLibrary = readLibraries().find(
+        (library) => library.id === "liked-songs",
+      );
+      updateLikeButton(
+        Boolean(
+          likedLibrary?.tracks.some((track) => track.id === currentTrack.id),
+        ),
+      );
+    } catch (error) {
+      setPlayerLibraryStatus(`Gagal membaca Liked Songs: ${error.message}`, true);
+    }
+  };
+
+  // Tambah atau hapus lagu aktif dari Library otomatis Liked Songs.
+  const toggleCurrentTrackLike = () => {
+    if (!currentTrack) return;
+
+    try {
+      const libraries = readLibraries();
+      const likedLibrary = libraries.find(
+        (library) => library.id === "liked-songs",
+      );
+      if (!likedLibrary) throw new Error("Library Liked Songs tidak ditemukan.");
+
+      const likedIndex = likedLibrary.tracks.findIndex(
+        (track) => track.id === currentTrack.id,
+      );
+      if (likedIndex === -1) {
+        likedLibrary.tracks.push(currentTrack);
+      } else {
+        likedLibrary.tracks.splice(likedIndex, 1);
+      }
+
+      writeLibraries(libraries);
+      renderSidebarLibraries();
+      updateLikeButton(likedIndex === -1);
+      setPlayerLibraryStatus(
+        likedIndex === -1
+          ? "Lagu ditambahkan ke Liked Songs."
+          : "Lagu dihapus dari Liked Songs.",
+      );
+    } catch (error) {
+      setPlayerLibraryStatus(`Gagal memperbarui Liked Songs: ${error.message}`, true);
+    }
+  };
+
+  // Isi pilihan koleksi pada pemutar lagu.
+  const openPlayerLibraryPicker = () => {
+    if (!playerLibraryPicker || !playerLibrarySelect) return;
+    playerLibraryPicker.hidden = false;
+    npAddToLibraryBtn?.setAttribute("aria-expanded", "true");
+
+    try {
+      const libraries = readLibraries();
+      playerLibrarySelect.innerHTML = `
+        <option value="">Pilih Library</option>
+        ${libraries
+          .map(
+            (library) => `
+              <option value="${escapeHTML(library.id)}">${escapeHTML(library.name)}</option>
+            `,
+          )
+          .join("")}
+      `;
+      setPlayerLibraryStatus(
+        currentTrack ? "" : "Putar lagu terlebih dahulu untuk menambahkannya.",
+      );
+      if (currentTrack) playerLibrarySelect.focus();
+    } catch (error) {
+      setPlayerLibraryStatus(`Gagal memuat Library: ${error.message}`, true);
+    }
+  };
+
+  // Simpan lagu yang sedang diputar ke Library pilihan dari pemutar.
+  const addCurrentTrackToLibrary = () => {
+    if (!currentTrack) {
+      setPlayerLibraryStatus("Putar lagu terlebih dahulu.", true);
+      return;
+    }
+
+    const libraryId = playerLibrarySelect?.value;
+    if (!libraryId) {
+      setPlayerLibraryStatus("Pilih Library tujuan terlebih dahulu.", true);
+      return;
+    }
+
+    try {
+      const libraries = readLibraries();
+      const library = libraries.find((item) => item.id === libraryId);
+      if (!library) throw new Error("Library tidak ditemukan.");
+      if (library.tracks.some((track) => track.id === currentTrack.id)) {
+        setPlayerLibraryStatus(`Lagu sudah ada di "${library.name}".`, true);
+        return;
+      }
+
+      library.tracks.push(currentTrack);
+      writeLibraries(libraries);
+      renderSidebarLibraries();
+      if (library.id === "liked-songs") syncCurrentTrackLike();
+      setPlayerLibraryStatus(`Lagu ditambahkan ke "${library.name}".`);
+    } catch (error) {
+      setPlayerLibraryStatus(`Gagal menambahkan lagu: ${error.message}`, true);
+    }
+  };
 
   // Sinkronkan ikon play/pause di panel penuh maupun mini player
   const syncPlayIcons = () => {
@@ -374,20 +717,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Hubungkan halaman yang perlu dirender dari data mock atau LocalStorage.
       if (pageName === "album") renderAlbumGrid();
-      if (pageName === "library") renderLibrary();
+      if (pageName === "library") renderLibraryPage();
     } catch (error) {
       mainContent.innerHTML = `<div style="padding: 2rem; color: #ff5555;"><h3>Error: ${error.message}</h3></div>`;
     }
   };
 
   // Set info lagu, reset progress ke 0, buka player, dan mulai timer
-  const playTrack = (title, artist, duration, index = -1) => {
+  const playTrack = (title, artist, duration, index = -1, trackId = "") => {
     currentTrackIndex = index;
+    currentTrack = {
+      id: trackId || `${artist.toLowerCase()}::${title.toLowerCase()}`,
+      title,
+      artist,
+      duration: duration || "3:30",
+      cover: "cover-violet",
+    };
     if (npTitle) npTitle.textContent = title;
     if (npArtist) npArtist.textContent = artist;
     if (miniTitle) miniTitle.textContent = title;
     if (miniArtist) miniArtist.textContent = artist;
     if (npDuration) npDuration.textContent = duration || "3:30";
+    if (playerLibraryPicker) playerLibraryPicker.hidden = true;
+    npAddToLibraryBtn?.setAttribute("aria-expanded", "false");
+    setPlayerLibraryStatus();
+    syncCurrentTrackLike();
 
     elapsedSeconds = 0;
     totalSeconds = parseDuration(duration);
@@ -412,7 +766,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? 0
         : (currentTrackIndex + step + cards.length) % cards.length;
     const track = parseTrackCard(cards[nextIndex]);
-    playTrack(track.title, track.artist, track.duration, nextIndex);
+    playTrack(track.title, track.artist, track.duration, nextIndex, track.id);
   };
 
   // Event klik dan drag pada garis progress untuk pindah menit/detik
@@ -456,7 +810,32 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Buka detail album, simpan lagu, atau tampilkan kembali daftar album.
+    // Buka form Library dan langsung fokus ke kolom nama.
+    if (e.target.closest("[data-create-library-shortcut]")) {
+      activeLibraryId = null;
+      loadPage("library").then(() => {
+        document.getElementById("library-name")?.focus();
+      });
+      return;
+    }
+
+    // Atur koleksi tujuan untuk lagu yang sedang diputar.
+    if (e.target.closest("#np-add-to-library")) {
+      if (playerLibraryPicker?.hidden) {
+        openPlayerLibraryPicker();
+      } else if (playerLibraryPicker) {
+        playerLibraryPicker.hidden = true;
+        npAddToLibraryBtn?.setAttribute("aria-expanded", "false");
+      }
+      return;
+    }
+
+    if (e.target.closest("#player-library-add")) {
+      addCurrentTrackToLibrary();
+      return;
+    }
+
+    // Buka album atau pilih lagu untuk dimasukkan ke Library tertentu.
     const albumCard = e.target.closest("[data-album-id]");
     if (albumCard) {
       const album = albums.find((item) => item.id === albumCard.dataset.albumId);
@@ -469,15 +848,34 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const saveButton = e.target.closest("[data-save-track]");
-    if (saveButton) {
-      saveTrackToLibrary(saveButton.dataset.saveTrack);
+    if (e.target.closest("[data-show-libraries]")) {
+      activeLibraryId = null;
+      renderLibraryPage();
+      return;
+    }
+
+    const libraryCard = e.target.closest("[data-open-library]");
+    if (libraryCard) {
+      activeLibraryId = libraryCard.dataset.openLibrary;
+      renderLibraryPage();
+      return;
+    }
+
+    const addButton = e.target.closest("[data-add-track]");
+    if (addButton) {
+      const targetSelect = addButton
+        .closest(".track-row")
+        ?.querySelector("[data-library-for]");
+      addTrackToLibrary(addButton.dataset.addTrack, targetSelect?.value || "");
       return;
     }
 
     const removeButton = e.target.closest("[data-remove-track]");
     if (removeButton) {
-      removeTrackFromLibrary(removeButton.dataset.removeTrack);
+      removeTrackFromLibrary(
+        removeButton.dataset.removeTrack,
+        removeButton.dataset.fromLibrary,
+      );
       return;
     }
 
@@ -486,7 +884,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (link) {
       e.preventDefault();
       const targetPage = link.getAttribute("data-target");
-      if (targetPage) loadPage(targetPage);
+      if (targetPage) {
+        if (targetPage === "library") {
+          activeLibraryId = link.dataset.libraryId || null;
+        }
+        loadPage(targetPage);
+      }
       return;
     }
 
@@ -518,7 +921,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const cards = getTrackElements();
       const index = cards.indexOf(songCard);
       const track = parseTrackCard(songCard);
-      playTrack(track.title, track.artist, track.duration, index);
+      playTrack(track.title, track.artist, track.duration, index, track.id);
       return;
     }
 
@@ -541,13 +944,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Toggle status tombol like (hati)
+    // Simpan atau hapus lagu aktif pada Library Liked Songs.
     if (e.target.closest("#np-like") && npLikeBtn) {
-      isLiked = !isLiked;
-      npLikeBtn.classList.toggle("liked", isLiked);
-      npLikeBtn.innerHTML = isLiked
-        ? `<i class="fa-solid fa-heart"></i>`
-        : `<i class="fa-regular fa-heart"></i>`;
+      toggleCurrentTrackLike();
       return;
     }
 
@@ -562,6 +961,17 @@ document.addEventListener("DOMContentLoaded", () => {
       appLayout?.classList.remove("is-minimized");
     }
   });
+
+  // Tangani form pembuatan Library tanpa memuat ulang seluruh aplikasi.
+  document.body.addEventListener("submit", (e) => {
+    const form = e.target.closest("#create-library-form");
+    if (!form) return;
+
+    e.preventDefault();
+    createLibrary(form.elements.libraryName.value);
+  });
+
+  renderSidebarLibraries();
 
   // Tampilkan halaman home saat web pertama kali dibuka
   loadPage("home");

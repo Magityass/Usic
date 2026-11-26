@@ -56,66 +56,25 @@
                 <div class="library-section">
                     <div class="section-header">
                         <span>YOUR LIBRARY</span>
-                        <a
-                            href="#"
-                            class="see-all nav-link"
-                            data-target="library"
-                            >See all</a
-                        >
+                        <div class="library-header-actions">
+                            <button
+                                type="button"
+                                class="library-add-button"
+                                data-create-library-shortcut
+                                aria-label="Buat Library"
+                                title="Buat Library"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <a
+                                href="#"
+                                class="see-all nav-link"
+                                data-target="library"
+                                >See all</a
+                            >
+                        </div>
                     </div>
-                    <ul class="library-list">
-                        <li
-                            class="library-item nav-link"
-                            data-target="playlist"
-                        >
-                            <div class="item-thumb">
-                                <i class="fa-solid fa-music"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>Chill Vibes Lounge</h4>
-                                <p>Playlist</p>
-                            </div>
-                        </li>
-                        <li class="library-item nav-link" data-target="artist">
-                            <div class="item-thumb">
-                                <i class="fa-regular fa-user"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>Sia</h4>
-                                <p>Artist</p>
-                            </div>
-                        </li>
-                        <li class="library-item nav-link" data-target="album">
-                            <div class="item-thumb">
-                                <i class="fa-solid fa-compact-disc"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>Harry Styles</h4>
-                                <p>Album</p>
-                            </div>
-                        </li>
-                        <li
-                            class="library-item nav-link"
-                            data-target="playlist"
-                        >
-                            <div class="item-thumb">
-                                <i class="fa-solid fa-music"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>Road Trip Mixtape</h4>
-                                <p>Playlist</p>
-                            </div>
-                        </li>
-                        <li class="library-item nav-link" data-target="album">
-                            <div class="item-thumb">
-                                <i class="fa-solid fa-compact-disc"></i>
-                            </div>
-                            <div class="item-info">
-                                <h4>Past Life</h4>
-                                <p>Album</p>
-                            </div>
-                        </li>
-                    </ul>
+                    <ul class="library-list" id="user-library-list"></ul>
                 </div>
             </aside>
 
@@ -194,7 +153,8 @@
                         <button
                             class="np-btn like-btn"
                             id="np-like"
-                            aria-label="Like"
+                            aria-label="Tambah atau hapus dari Liked Songs"
+                            aria-pressed="false"
                         >
                             <i class="fa-regular fa-heart"></i>
                         </button>
@@ -228,6 +188,26 @@
                         >
                             <i class="fa-regular fa-file-lines"></i>
                         </button>
+                        <button
+                            class="np-btn"
+                            id="np-add-to-library"
+                            aria-label="Tambahkan lagu ke Library"
+                            aria-expanded="false"
+                            aria-controls="player-library-picker"
+                        >
+                            <i class="fa-solid fa-folder-plus"></i>
+                        </button>
+                    </div>
+
+                    <div class="player-library-picker" id="player-library-picker" hidden>
+                        <label for="player-library-select">Tambahkan lagu ke Library</label>
+                        <div class="player-library-picker-controls">
+                            <select id="player-library-select">
+                                <option value="">Pilih Library</option>
+                            </select>
+                            <button type="button" id="player-library-add">Tambah</button>
+                        </div>
+                        <p id="player-library-status" role="status" aria-live="polite"></p>
                     </div>
 
                     <div class="np-progress">
