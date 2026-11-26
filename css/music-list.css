@@ -698,15 +698,16 @@
 .library-collection-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 12px;
+    gap: 18px;
+    margin-top: 8px;
 }
 
 .library-collection-card {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     min-width: 0;
-    padding: 14px;
+    padding: 18px;
     color: var(--text-main);
     text-align: left;
     background: var(--bg-card);
@@ -722,9 +723,9 @@
 
 .collection-icon {
     display: flex;
-    flex: 0 0 42px;
-    width: 42px;
-    height: 42px;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
     align-items: center;
     justify-content: center;
     color: var(--accent-green);
@@ -752,6 +753,14 @@
 }
 
 @media (max-width: 600px) {
+    .library-collection-grid {
+        gap: 12px;
+    }
+
+    .library-collection-card {
+        padding: 14px;
+    }
+
     .track-row {
         align-items: flex-start;
         flex-wrap: wrap;
