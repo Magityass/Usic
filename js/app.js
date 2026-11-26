@@ -18,6 +18,248 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggleBtn = document.getElementById("theme-toggle");
 
   const THEME_KEY = "usic_theme";
+  const LIBRARY_KEY = "usic_saved_tracks";
+
+  // Data contoh album beserta lagu yang ditampilkan pada halaman Album.
+  const albums = [
+    {
+      id: "senja",
+      title: "Cerita Senja",
+      artist: "Nara",
+      year: 2024,
+      cover: "cover-violet",
+      tracks: [
+        { id: "langit-sore", title: "Langit Sore", duration: "3:42" },
+        { id: "pulang-perlahan", title: "Pulang Perlahan", duration: "4:05" },
+        { id: "satu-kota", title: "Satu Kota", duration: "3:28" },
+      ],
+    },
+    {
+      id: "ruang",
+      title: "Ruang Antara",
+      artist: "Arunika",
+      year: 2023,
+      cover: "cover-blue",
+      tracks: [
+        { id: "ruang-kecil", title: "Ruang Kecil", duration: "3:51" },
+        { id: "berjalan", title: "Berjalan", duration: "4:16" },
+        { id: "jeda", title: "Jeda", duration: "3:34" },
+      ],
+    },
+    {
+      id: "warna",
+      title: "Warna-Warni",
+      artist: "Matahari Pagi",
+      year: 2022,
+      cover: "cover-orange",
+      tracks: [
+        { id: "mulai-lagi", title: "Mulai Lagi", duration: "3:37" },
+        { id: "hari-baru", title: "Hari Baru", duration: "3:59" },
+        { id: "beranda", title: "Beranda", duration: "4:02" },
+      ],
+    },
+    {
+      id: "hijau",
+      title: "Tumbuh",
+      artist: "Damar",
+      year: 2021,
+      cover: "cover-green",
+      tracks: [
+        { id: "akar", title: "Akar", duration: "3:46" },
+        { id: "daun-baru", title: "Daun Baru", duration: "3:31" },
+        { id: "terang", title: "Terang", duration: "4:12" },
+      ],
+    },
+  ];
+
+  // Escape teks sebelum dimasukkan ke dalam template HTML.
+  const escapeHTML = (value) =>
+    String(value).replace(/[&<>"']/g, (character) => {
+      const entities = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      };
+      return entities[character];
+    });
+
+  // Baca koleksi dari LocalStorage dan laporkan jika formatnya tidak valid.
+  const readLibrary = () => {
+    const storedTracks = localStorage.getItem(LIBRARY_KEY);
+    if (storedTracks === null) return [];
+
+    const tracks = JSON.parse(storedTracks);
+    if (
+      !Array.isArray(tracks) ||
+      tracks.some(
+        (track) =>
+          !track ||
+          typeof track.id !== "string" ||
+          typeof track.title !== "string" ||
+          typeof track.artist !== "string",
+      )
+    ) {
+      throw new Error("Data Library tidak valid.");
+    }
+    return tracks;
+  };
+
+  // Tampilkan album mock data sebagai grid kartu yang dapat dibuka.
+  const renderAlbumGrid = () => {
+    const albumContent = document.getElementById("album-content");
+    if (!albumContent) return;
+
+    albumContent.innerHTML = `
+      <div class="album-grid">
+        ${albums
+          .map(
+            (album) => `
+              <button class="album-card" type="button" data-album-id="${escapeHTML(album.id)}">
+                <span class="album-cover ${album.cover}" aria-hidden="true">
+                  <span class="album-art-title">${escapeHTML(album.title)}</span>
+                </span>
+                <h2>${escapeHTML(album.title)}</h2>
+                <p class="album-meta">${escapeHTML(album.artist)} &middot; ${album.year}</p>
+              </button>
+            `,
+          )
+          .join("")}
+      </div>
+    `;
+  };
+
+  // Tampilkan detail album dan status tombol sesuai isi Library.
+  const renderAlbumDetail = (album, message = "") => {
+    const albumContent = document.getElementById("album-content");
+    if (!albumContent) return;
+
+    let savedTrackIds = [];
+    let storageError = "";
+    try {
+      savedTrackIds = readLibrary().map((track) => track.id);
+    } catch (error) {
+      storageError = error.message;
+    }
+
+    albumContent.innerHTML = `
+      <button class="text-button" type="button" data-show-albums>&larr; Kembali ke Album</button>
+      <div class="album-detail-header">
+        <div class="album-cover ${album.cover}" aria-hidden="true">
+          <span class="album-art-title">${escapeHTML(album.title)}</span>
+        </div>
+        <div class="album-detail-info">
+          <p>ALBUM &middot; ${album.year}</p>
+          <h2>${escapeHTML(album.title)}</h2>
+          <p>${escapeHTML(album.artist)} &middot; ${album.tracks.length} lagu</p>
+        </div>
+      </div>
+      <div class="track-list">
+        ${album.tracks
+          .map((track) => {
+            const isSaved = savedTrackIds.includes(track.id);
+            return `
+              <article class="track-row">
+                <div class="track-meta">
+                  <h3>${escapeHTML(track.title)}</h3>
+                  <p>${escapeHTML(album.artist)}</p>
+                </div>
+                <div class="track-actions">
+                  <span class="track-duration">${escapeHTML(track.duration)}</span>
+                  <button
+                    class="save-track-button"
+                    type="button"
+                    data-save-track="${escapeHTML(track.id)}"
+                    ${isSaved ? "disabled" : ""}
+                  >${isSaved ? "Tersimpan" : "Simpan ke Library"}</button>
+                </div>
+              </article>
+            `;
+          })
+          .join("")}
+      </div>
+      <p class="feature-message ${storageError ? "is-error" : ""}" role="status" aria-live="polite">${escapeHTML(storageError || message)}</p>
+    `;
+  };
+
+  // Simpan lagu ke LocalStorage dan cegah lagu yang sama tersimpan dua kali.
+  const saveTrackToLibrary = (trackId) => {
+    const album = albums.find((item) =>
+      item.tracks.some((track) => track.id === trackId),
+    );
+    const track = album?.tracks.find((item) => item.id === trackId);
+    if (!album || !track) return;
+
+    try {
+      const savedTracks = readLibrary();
+      if (savedTracks.some((item) => item.id === track.id)) {
+        renderAlbumDetail(album, "Lagu ini sudah ada di Library.");
+        return;
+      }
+
+      savedTracks.push({
+        ...track,
+        artist: album.artist,
+        album: album.title,
+        year: album.year,
+        cover: album.cover,
+      });
+      localStorage.setItem(LIBRARY_KEY, JSON.stringify(savedTracks));
+      renderAlbumDetail(album, "Lagu berhasil disimpan ke Library.");
+    } catch (error) {
+      renderAlbumDetail(album, `Gagal menyimpan lagu: ${error.message}`);
+      document.querySelector("#album-content .feature-message")?.classList.add("is-error");
+    }
+  };
+
+  // Render koleksi yang tersimpan atau pesan jika belum ada lagu.
+  const renderLibrary = (message = "") => {
+    const libraryContent = document.getElementById("library-content");
+    if (!libraryContent) return;
+
+    try {
+      const savedTracks = readLibrary();
+      libraryContent.innerHTML = savedTracks.length
+        ? `
+          <div class="saved-track-list">
+            ${savedTracks
+              .map(
+                (track) => `
+                  <article class="saved-track-row">
+                    <span class="album-cover ${escapeHTML(track.cover || "cover-violet")}" aria-hidden="true">
+                      <span class="album-art-title">${escapeHTML(track.album || "Library")}</span>
+                    </span>
+                    <div class="saved-track-meta">
+                      <h2>${escapeHTML(track.title)}</h2>
+                      <p>${escapeHTML(track.artist)} &middot; ${escapeHTML(track.album || "Album")} (${escapeHTML(track.year || "")})</p>
+                    </div>
+                    <button class="remove-track-button" type="button" data-remove-track="${escapeHTML(track.id)}">Hapus</button>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+          <p class="feature-message" role="status" aria-live="polite">${escapeHTML(message)}</p>
+        `
+        : `<p class="empty-library">Library masih kosong. Simpan lagu dari halaman Album untuk mulai mengisi koleksimu.</p>`;
+    } catch (error) {
+      libraryContent.innerHTML = `<p class="feature-message is-error" role="alert">Gagal membaca Library: ${escapeHTML(error.message)}</p>`;
+    }
+  };
+
+  // Hapus lagu berdasarkan ID lalu perbarui tampilan Library.
+  const removeTrackFromLibrary = (trackId) => {
+    try {
+      const savedTracks = readLibrary();
+      const updatedTracks = savedTracks.filter((track) => track.id !== trackId);
+      localStorage.setItem(LIBRARY_KEY, JSON.stringify(updatedTracks));
+      renderLibrary("Lagu berhasil dihapus dari Library.");
+    } catch (error) {
+      renderLibrary(`Gagal menghapus lagu: ${error.message}`);
+      document.querySelector("#library-content .feature-message")?.classList.add("is-error");
+    }
+  };
 
   // Terapkan tema dark atau light dan ubah ikon matahari/bulan
   const applyTheme = (theme) => {
@@ -129,6 +371,10 @@ document.addEventListener("DOMContentLoaded", () => {
           nav.classList.add("active");
         }
       });
+
+      // Hubungkan halaman yang perlu dirender dari data mock atau LocalStorage.
+      if (pageName === "album") renderAlbumGrid();
+      if (pageName === "library") renderLibrary();
     } catch (error) {
       mainContent.innerHTML = `<div style="padding: 2rem; color: #ff5555;"><h3>Error: ${error.message}</h3></div>`;
     }
@@ -207,6 +453,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.closest("#theme-toggle")) {
       const currentTheme = document.documentElement.getAttribute("data-theme");
       applyTheme(currentTheme === "light" ? "dark" : "light");
+      return;
+    }
+
+    // Buka detail album, simpan lagu, atau tampilkan kembali daftar album.
+    const albumCard = e.target.closest("[data-album-id]");
+    if (albumCard) {
+      const album = albums.find((item) => item.id === albumCard.dataset.albumId);
+      if (album) renderAlbumDetail(album);
+      return;
+    }
+
+    if (e.target.closest("[data-show-albums]")) {
+      renderAlbumGrid();
+      return;
+    }
+
+    const saveButton = e.target.closest("[data-save-track]");
+    if (saveButton) {
+      saveTrackToLibrary(saveButton.dataset.saveTrack);
+      return;
+    }
+
+    const removeButton = e.target.closest("[data-remove-track]");
+    if (removeButton) {
+      removeTrackFromLibrary(removeButton.dataset.removeTrack);
       return;
     }
 

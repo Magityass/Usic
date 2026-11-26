@@ -312,3 +312,289 @@
         right: -8px;
     }
 }
+
+/* Halaman album dan Library */
+.music-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 20px;
+}
+
+.music-page-header h1 {
+    margin: 4px 0;
+    font-size: 1.8rem;
+}
+
+.music-page-header > p:last-child,
+.eyebrow,
+.album-meta,
+.track-meta p,
+.saved-track-meta p {
+    color: var(--text-muted);
+}
+
+.music-page-header > p:last-child {
+    font-size: 0.88rem;
+}
+
+.eyebrow {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 18px;
+}
+
+.album-card {
+    min-width: 0;
+    padding: 12px;
+    text-align: left;
+    color: var(--text-main);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    cursor: pointer;
+    transition:
+        background-color 0.2s,
+        transform 0.2s;
+}
+
+.album-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-3px);
+}
+
+.album-cover {
+    display: flex;
+    aspect-ratio: 1;
+    align-items: flex-end;
+    padding: 14px;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.22);
+}
+
+.cover-violet {
+    background: linear-gradient(145deg, #c06cff, #32205e 75%);
+}
+
+.cover-blue {
+    background: linear-gradient(145deg, #62d6e8, #173459 75%);
+}
+
+.cover-orange {
+    background: linear-gradient(145deg, #ffae67, #7d2637 75%);
+}
+
+.cover-green {
+    background: linear-gradient(145deg, #80d69c, #1d473e 75%);
+}
+
+.album-art-title {
+    color: #fff;
+    font-size: 1.12rem;
+    font-weight: 800;
+    line-height: 1.05;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.album-card h2 {
+    margin-top: 12px;
+    overflow: hidden;
+    font-size: 0.95rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.album-meta {
+    margin-top: 4px;
+    font-size: 0.78rem;
+}
+
+.album-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 22px 0;
+}
+
+.album-detail-header .album-cover {
+    flex: 0 0 150px;
+    width: 150px;
+}
+
+.album-detail-info h2 {
+    margin: 6px 0;
+    font-size: 1.55rem;
+}
+
+.album-detail-info p {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+}
+
+.text-button {
+    padding: 0;
+    color: var(--accent-green);
+    background: none;
+    border: 0;
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.track-list,
+.saved-track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.track-row,
+.saved-track-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+}
+
+.track-meta,
+.saved-track-meta {
+    min-width: 0;
+}
+
+.track-meta h3,
+.saved-track-meta h2 {
+    overflow-wrap: anywhere;
+    font-size: 0.88rem;
+}
+
+.track-meta p,
+.saved-track-meta p {
+    margin-top: 3px;
+    font-size: 0.76rem;
+}
+
+.track-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.track-duration {
+    color: var(--text-muted);
+    font-size: 0.76rem;
+}
+
+.save-track-button,
+.remove-track-button {
+    padding: 8px 11px;
+    color: var(--text-main);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.save-track-button:hover,
+.remove-track-button:hover {
+    background: var(--bg-elevated-hover);
+}
+
+.save-track-button:disabled {
+    color: var(--accent-green);
+    cursor: default;
+}
+
+.saved-track-row {
+    justify-content: flex-start;
+}
+
+.saved-track-row .album-cover {
+    flex: 0 0 48px;
+    width: 48px;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.saved-track-row .album-art-title {
+    font-size: 0.43rem;
+}
+
+.saved-track-meta {
+    flex: 1;
+}
+
+.empty-library,
+.feature-message {
+    padding: 22px;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    font-size: 0.86rem;
+}
+
+.feature-message {
+    margin-top: 14px;
+}
+
+.feature-message:empty {
+    display: none;
+}
+
+.feature-message.is-error {
+    color: #ff8585;
+}
+
+@media (max-width: 600px) {
+    .album-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .album-card {
+        padding: 9px;
+    }
+
+    .album-detail-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .album-detail-header .album-cover {
+        flex-basis: 110px;
+        width: 110px;
+        padding: 9px;
+    }
+
+    .album-detail-info h2 {
+        font-size: 1.2rem;
+    }
+
+    .track-row,
+    .saved-track-row {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .track-actions {
+        gap: 7px;
+    }
+
+    .save-track-button,
+    .remove-track-button {
+        padding: 7px 9px;
+    }
+}
